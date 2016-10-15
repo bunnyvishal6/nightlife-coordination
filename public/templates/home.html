@@ -1,0 +1,30 @@
+<div class="row">
+	<div class="col-lg-6 col-centered">
+		<form name="search" ng-submit="searchLocation()" id="searchForm">
+			<div class="input-group">
+				<input type="text" class="form-control" ng-model="location" name="location" ng-maxlength="100" placeholder="type your location here.."
+					required>
+				<span class="input-group-btn">
+                    <button type="submit" class="btn btn-success" type="button">Search</button>
+                </span>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div id="noBarsAvailable">
+	<h4 class="text-center text-danger">Oops! no bar is registered in your location </h4>
+</div>
+
+<div class="row">
+	<div class="col-md-10 col-centered">
+		<div ng-repeat="bar in bars" class="bar-frame">
+			<img ng-src="{{bar.image_url}}" class="img-rounded bar-image" onerror="this.onerror=null; this.src='https://i.imgur.com/QQMf8ON.png'"
+			/>
+			<div>
+				<a ng-href="{{bar.url}}" style="text-decoration: none" target="_blank"><h4>{{bar.name}}</h4></a>
+				<p>{{bar.snippet_text}}</p>
+			</div>
+		</div>
+	</div>
+</div>

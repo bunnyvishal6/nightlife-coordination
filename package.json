@@ -1,0 +1,32 @@
+{
+  "name": "nightlife-coordination",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bunnyvishal6/nightlife-coordination.git"
+  },
+  "keywords": [
+    "Full Stack",
+    "Javascript",
+    "Nightlife coordination",
+    "MEAN",
+    "Html",
+    "Css"
+  ],
+  "author": "bunny vishal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bunnyvishal6/nightlife-coordination/issues"
+  },
+  "homepage": "https://github.com/bunnyvishal6/nightlife-coordination#readme",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "yelp": "^1.0.1"
+  }
+}

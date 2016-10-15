@@ -1,0 +1,35 @@
+#main-title{
+    margin-top: 40px;
+}
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+
+#searchForm{
+    margin: 50px auto;
+}
+
+#noBarsAvailable{
+    margin: auto;
+    display: none;
+}
+
+.bar-frame{
+    margin: 2% auto;
+    border: 5px solid dodgerblue;
+    border-radius: 10px;
+    overflow: hidden; /*useful to acertain the height of this div when it contains floating elements*/
+}
+
+.bar-image{
+    height: 100px;
+    width: 100px;
+    margin: .5%;
+    float: left; /*used to display text inline*/
+}
+
+#foot{
+    margin: 5% auto;
+}
