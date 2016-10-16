@@ -23,7 +23,9 @@
 			/>
 			<div>
 				<a ng-href="{{bar.url}}" style="text-decoration: none" target="_blank"><h4>{{bar.name}}</h4></a>
-				<p>{{bar.snippet_text}}</p>
+				<button class="btn btn-sm btn-primary">&nbsp; Going &nbsp;</button>
+				<p ng-hide="!bar.snippet_text">{{bar.snippet_text}}</p>
+				<p ng-hide="bar.snippet_text">No review found.</p>
 			</div>
 		</div>
 	</div>

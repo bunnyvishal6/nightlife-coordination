@@ -1,5 +1,8 @@
+@import url('https://fonts.googleapis.com/css?family=Bree+Serif');
+
 #main-title{
-    margin-top: 40px;
+    margin-top: 3%;
+    font-family: 'Bree Serif';
 }
 
 .col-centered{
@@ -8,7 +11,7 @@
 }
 
 #searchForm{
-    margin: 50px auto;
+    margin: 5% auto 3% auto;
 }
 
 #noBarsAvailable{
@@ -18,15 +21,20 @@
 
 .bar-frame{
     margin: 2% auto;
-    border: 5px solid dodgerblue;
+    border: 2px solid dodgerblue;
     border-radius: 10px;
     overflow: hidden; /*useful to acertain the height of this div when it contains floating elements*/
+}
+
+.bar-frame:hover{
+    background-color: lightgrey;
+    border: 2px solid blueviolet;
 }
 
 .bar-image{
     height: 100px;
     width: 100px;
-    margin: .5%;
+    margin: 1%;
     float: left; /*used to display text inline*/
 }
 
