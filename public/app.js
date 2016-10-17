@@ -1,46 +1,44 @@
-angular.module('nightlife', ['ui.router'])
-    //config for ui routing
-    .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider) {
-        $urlRouterProvider.otherwise('/');
-        $stateProvider
-            .state('home', {
-                url: '/',
-                templateUrl: '/public/templates/home.html',
-                controller: 'HomeCtrl'
-            })
-            .state('login', {
-                url: '/login',
-                templateUrl: 'public/templates/login.html',
-                controller: 'LoginCtrl'
-            })
-    }])
+angular.module('nightlife', ['ngRoute'])
+    
     //Home controller
     .controller('HomeCtrl', ['$scope', '$http', '$window', function ($scope, $http, $window) {
+        //$scope.bars init
         $scope.bars = [];
+        //Check if savedSearch exists if so display loading icon
+        $http.get('/checkForSavedSearch')
+            .success(function(msg){
+                if(msg == "yes"){
+                   return $("#refreshIcon").css('display', 'block');
+                }
+            });
         //Try to get for savedSearch
         $http.get('/savedSearch')
             .success(function(data){
                 if(data.bars){
+                    $("#refreshIcon").css('display', 'none');
                     $scope.bars = data.bars;
                     return $scope.location = data.savedSearch;
                 } 
             })
-
-        $scope.searchLocation = function () {
+        //get bars
+        $scope.getBars = function () {
+            $scope.bars = [];
             $("#noBarsAvailable").css('display', 'none');
+            $('#refreshIcon').css('display', 'block');
             $http.post('/search/' + $scope.location)
                 .success(function (data) {
                     if (data.error) {
-                        console.log(data);
+                        $('#refreshIcon').css('display', 'none');
                         $("#noBarsAvailable").css('display', 'block');
                     } else {
-                        console.log(data);
+                        $('#refreshIcon').css('display', 'none');
                         $("#noBarsAvailable").css('display', 'none');
                         $scope.bars = data;
                     }
                 })
                 .error(function (err) {
                     console.log(err);
+                    $('#refreshIcon').css('display', 'none');
                     $("#noBarsAvailable").css('display', 'block');
                 })
         };
@@ -49,7 +47,7 @@ angular.module('nightlife', ['ui.router'])
             $http.post('/goingTo', bar)
                 .success(function (data) {
                     if (data.jwt) {
-                        console.log(data.jwt);
+                        console.log(data);
                     } else {
                         $window.location.href = '/auth/twitter';
                     }
@@ -66,4 +64,11 @@ angular.module('nightlife', ['ui.router'])
                         })
                 });
         }
-    }]);
+    }])
+    
+    .directive('bars', function(){
+        return {
+            restrict: 'E',
+            templateUrl: '/public/templates/bars.html'
+        };
+    });
