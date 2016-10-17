@@ -107,37 +107,51 @@ app.post('/goingTo', (req, res) => {
 
 //saveSearch
 app.post('/saveSearch', (req, res) => {
-    req.session.savedSearch = req.body.saveSearch;
-    res.json("success");
+    console.log('saveSearch called');
+    if (req.body.saveSearch) {
+        req.session.savedSearch = req.body.saveSearch;
+        res.json("success");
+    } else {
+        res.json("no-save-search");
+    }
+});
+
+//check for savedSearch
+app.get('/checkForSavedSearch', (req, res) => {
+    console.log('checkForSavedSearch called');
+    if (req.session.savedSearch) {
+        res.json("yes");
+    }
 });
 
 //get savedSearch
 app.get('/savedSearch', (req, res) => {
-    if(req.session.savedSearch){
+    console.log("savedSearch called");
+    if (req.session.savedSearch) {
         yelp.search({ term: 'bar', location: req.session.savedSearch, limit: 20 })
-        .then((data) => {
-            var array = [];
-            var bars = data.businesses;
-            console.log(bars.length);
-            for (var i = 0; i < bars.length; i++) {
-                array.push({
-                    id: bars[i].id,
-                    image_url: bars[i].image_url,
-                    name: bars[i].name,
-                    url: bars[i].url,
-                    snippet_text: bars[i].snippet_text
-                });
-                if (i == (bars.length - 1)) {
-                    const savedSearch = req.session.savedSearch;
-                    req.session.savedSearch = null;
-                    return res.json({bars: bars, savedSearch: savedSearch});
+            .then((data) => {
+                var array = [];
+                var bars = data.businesses;
+                console.log(bars.length);
+                for (var i = 0; i < bars.length; i++) {
+                    array.push({
+                        id: bars[i].id,
+                        image_url: bars[i].image_url,
+                        name: bars[i].name,
+                        url: bars[i].url,
+                        snippet_text: bars[i].snippet_text
+                    });
+                    if (i == (bars.length - 1)) {
+                        const savedSearch = req.session.savedSearch;
+                        req.session.savedSearch = null;
+                        return res.json({ bars: bars, savedSearch: savedSearch });
+                    }
                 }
-            }
-        })
-        .catch((err) => {
-            req.session.savedSearch = null;
-            return res.json(JSON.parse(err.data));
-        });
+            })
+            .catch((err) => {
+                req.session.savedSearch = null;
+                return res.json(JSON.parse(err.data));
+            });
     }
 });
 
