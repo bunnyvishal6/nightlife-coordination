@@ -6,10 +6,10 @@
 			<div>
 				<h4>
 					<a ng-href="{{bar.url}}" style="text-decoration: none" target="_blank">
-					            {{bar.name}}
-				            </a>
+					    {{bar.name}}
+				    </a>
 				</h4>
-				<button ng-click="go({id: bar.id})" class="btn btn-sm btn-primary">&nbsp; Going &nbsp;</button>
+				<button ng-click="go(bar)" class="btn btn-sm btn-primary">&nbsp; Going &nbsp;</button>
 				<p ng-hide="!bar.snippet_text">{{bar.snippet_text}}</p>
 				<p ng-hide="bar.snippet_text">No review found.</p>
 			</div>
