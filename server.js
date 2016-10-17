@@ -7,7 +7,8 @@ var express = require('express'),
     mongoose = require('mongoose'),
     twitterLogin = require('./config/passport'),
     Yelp = require('yelp'),
-    config = require('./config/config');
+    config = require('./config/config'),
+    Bar = require('./models/bar');
 
 //connect mongoose
 mongoose.connect(config.db);
@@ -80,7 +81,7 @@ app.post('/search/:location', (req, res) => {
             console.log(bars.length);
             for (var i = 0; i < bars.length; i++) {
                 array.push({
-                    id: bars[i].id,
+                    identifier: bars[i].id,
                     image_url: bars[i].image_url,
                     name: bars[i].name,
                     url: bars[i].url,
@@ -97,9 +98,25 @@ app.post('/search/:location', (req, res) => {
 });
 
 //user wanna got to this bar 
-app.post('/goingTo', (req, res) => {
+app.post('/goingTo', passport.authenticate('jwt', { session: false }), (req, res) => {
     if (req.session.user) {
-        res.json({ jwt: req.session.user });
+        Bar.findOrCreate(req.body.bar, (err, bar) => {
+            if(err){console.log(err); return res.json(err);}
+            const num = bar.going.indexOf(req.user._id);
+            if(num < 0){
+                bar.going.push(req.user._id);
+                bar.save((err)=>{
+                    if(err){console.log(err); return res.json(err);}
+                    return res.json("going");
+                });
+            } else {
+                bar.going.splice(num, 1);
+                bar.save((err)=>{
+                    if(err){console.log(err); return res.json(err)}
+                    return res.json("not-going");
+                });
+            }
+        });
     } else {
         res.status(401).json("no jwt found");
     }
@@ -119,9 +136,11 @@ app.post('/saveSearch', (req, res) => {
 //check for savedSearch
 app.get('/checkForSavedSearch', (req, res) => {
     console.log('checkForSavedSearch called');
+    var msg = "";
     if (req.session.savedSearch) {
-        res.json("yes");
+        msg = "yes";
     }
+    res.json({ jwt: req.session.user, msg: msg });
 });
 
 //get savedSearch
@@ -135,7 +154,7 @@ app.get('/savedSearch', (req, res) => {
                 console.log(bars.length);
                 for (var i = 0; i < bars.length; i++) {
                     array.push({
-                        id: bars[i].id,
+                        identifier: bars[i].id,
                         image_url: bars[i].image_url,
                         name: bars[i].name,
                         url: bars[i].url,
@@ -164,7 +183,7 @@ app.get('/search/:location', (req, res) => {
             console.log(bars.length);
             for (var i = 0; i < bars.length; i++) {
                 array.push({
-                    id: bars[i].id,
+                    identifier: bars[i].id,
                     image_url: bars[i].image_url,
                     name: bars[i].name,
                     url: bars[i].url,
