@@ -1,9 +1,16 @@
 var express = require('express'),
     app = express(),
     bodyParser = require('body-parser'),
-    path = require('path');
-Yelp = require('yelp');
-config = require('./config/config.js');
+    path = require('path'),
+    passport = require('passport'),
+    session = require('client-sessions'),
+    mongoose = require('mongoose'),
+    twitterLogin = require('./config/passport'),
+    Yelp = require('yelp'),
+    config = require('./config/config');
+
+//connect mongoose
+mongoose.connect(config.db);
 
 //Setup yelp client
 const yelp = new Yelp({
@@ -13,9 +20,28 @@ const yelp = new Yelp({
     token_secret: config.token_secret
 });
 
+// Client Session
+app.use(session({
+    cookieName: 'session',
+    secret: config.session_secret,
+    duration: 60 * 60 * 1000,
+    activeDuration: 10 * 60 * 1000,
+    cookie: {
+        httpOnly: true,
+        ephemeral: true
+    }
+}));
+
 //Use body-parser to get POST requests for API use
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+// Passport init
+app.use(passport.initialize());
+app.use(passport.session());
+
+//set twitterLogin strategy
+twitterLogin(passport);
 
 //statis files serve 
 app.use("/public", express.static(path.join(__dirname, 'public')));
@@ -33,12 +59,24 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './public/index.html'));
 });
 
+//get /auth/twitter
+app.get('/auth/twitter', passport.authenticate('twitter', { failureRedirect: '/loginFailedFirst', session: false }));
+
+//get /auth/twitter/callback
+app.get('/auth/twitter/callback',
+    passport.authenticate('twitter', { failureRedirect: '/loginFailedSecond', session: false }),
+    (req, res) => {
+        res.json(req.user);
+    }
+);
+
+
 //search for bar with provided location
 app.post('/search/:location', (req, res) => {
     yelp.search({ term: 'bar', location: req.params.location, limit: 20 })
         .then((data) => {
             var array = [];
-            bars = data.businesses;
+            var bars = data.businesses;
             console.log(bars.length);
             for (var i = 0; i < bars.length; i++) {
                 array.push({
@@ -56,14 +94,14 @@ app.post('/search/:location', (req, res) => {
         .catch((err) => {
             return res.json(JSON.parse(err.data));
         });
-})
+});
 
-// search for bar with provided location
+// search for bar with provided location (used for dev)
 app.get('/search/:location', (req, res) => {
     yelp.search({ term: 'bar', location: req.params.location, limit: 20 })
         .then((data) => {
             var array = [];
-            bars = data.businesses;
+            var bars = data.businesses;
             console.log(bars.length);
             for (var i = 0; i < bars.length; i++) {
                 array.push({

@@ -26,7 +26,12 @@
   "homepage": "https://github.com/bunnyvishal6/nightlife-coordination#readme",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "client-sessions": "^0.7.0",
     "express": "^4.14.0",
+    "jsonwebtoken": "^7.1.9",
+    "mongoose": "^4.6.4",
+    "passport": "^0.3.2",
+    "passport-twitter": "^1.0.4",
     "yelp": "^1.0.1"
   }
 }
