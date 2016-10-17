@@ -18,15 +18,16 @@ User.findOrCreate = (profile, done) => {
     User.findOne({ username: profile.id }, (err, user) => {
         if (err) { return done(err, null); }
         if (!user) {
-            console.log(profile);
             const newUser = new User({ username: profile.id, name: profile.displayName });
             newUser.save((err) => {
                 if (err) { return done(err); }
-                const token = 'JWT ' + jwt.sign({ id: user._id }, config.secret, { expiresIn: 100080 });
-                done(null, token);
+                User.findOne({ username: newUser.username }, (err, doc) => {
+                    const token = 'JWT ' + jwt.sign({ id: user._id }, config.secret, { expiresIn: "24h" });
+                    done(null, token);
+                });
             });
         } else {
-            const token = 'JWT ' + jwt.sign({ id: user._id }, config.secret, { expiresIn: 100080 });
+            const token = 'JWT ' + jwt.sign({ id: user._id }, config.secret, { expiresIn: "24h" });
             return done(null, token);
         }
     });
