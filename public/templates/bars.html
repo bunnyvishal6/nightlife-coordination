@@ -9,7 +9,7 @@
 					    {{bar.name}}
 				    </a>
 				</h4>
-				<button ng-click="go(bar)" class="btn btn-sm btn-primary">&nbsp; Going &nbsp;</button>
+				<button ng-click="go(bar)" class="btn btn-sm btn-primary">&nbsp; <span ng-if='bar.going'>{{bar.going.length}} &nbsp;</span> Going &nbsp;</button>
 				<p ng-hide="!bar.snippet_text">{{bar.snippet_text}}</p>
 				<p ng-hide="bar.snippet_text">No review found.</p>
 			</div>

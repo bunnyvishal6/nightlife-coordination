@@ -22,7 +22,7 @@ User.findOrCreate = (profile, done) => {
             newUser.save((err) => {
                 if (err) { return done(err); }
                 User.findOne({ username: newUser.username }, (err, doc) => {
-                    const token = 'JWT ' + jwt.sign({ _id: user._id }, config.secret, { expiresIn: "24h" });
+                    const token = 'JWT ' + jwt.sign({ _id: doc._id }, config.secret, { expiresIn: "24h" });
                     done(null, token);
                 });
             });
