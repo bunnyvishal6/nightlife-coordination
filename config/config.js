@@ -6,7 +6,7 @@ module.exports = {
     twitter_consumer_key: process.env.twitter_consumer_key ,
     twitter_consumer_secret: process.env.twitter_consumer_secret ,
     twitter_callback_url: process.env.twitter_callback_url  ,
-    db: process.env.mongooseUri ,
+    db: process.env.db ,
     secret: process.env.secret ,
     session_secret: process.env.session_secret 
 };
