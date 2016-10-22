@@ -81,7 +81,6 @@ app.post('/search/:location', (req, res) => {
         .then((data) => {
             var array = [];
             var bars = data.businesses;
-            console.log(bars.length);
             for (var i = 0; i < bars.length; i++) {
                 array.push({
                     identifier: bars[i].id,
@@ -102,7 +101,6 @@ app.post('/search/:location', (req, res) => {
 
 //check for savedSearch
 app.get('/checkForSavedSearch', (req, res) => {
-    console.log('checkForSavedSearch called');
     var msg = "";
     if (req.session.savedSearch) {
         msg = "yes";
@@ -112,7 +110,6 @@ app.get('/checkForSavedSearch', (req, res) => {
 
 //saveSearch
 app.post('/saveSearch', (req, res) => {
-    console.log('saveSearch called');
     if (req.body.saveSearch) {
         req.session.savedSearch = req.body.saveSearch;
         res.json("success");
@@ -123,13 +120,11 @@ app.post('/saveSearch', (req, res) => {
 
 //get savedSearch
 app.get('/savedSearch', (req, res) => {
-    console.log("savedSearch called");
     if (req.session.savedSearch) {
         yelp.search({ term: 'bar', location: req.session.savedSearch, limit: 20 })
             .then((data) => {
                 var array = [];
                 var bars = data.businesses;
-                console.log(bars.length);
                 for (var i = 0; i < bars.length; i++) {
                     array.push({
                         identifier: bars[i].id,
@@ -187,11 +182,9 @@ app.post('/goingTo', passport.authenticate('jwt', { session: false }), (req, res
 
 //getGoing number for the bar
 app.post('/getGoing', (req, res) => {
-    console.log(req.body.identifier);
     Bar.findOne({ identifier: req.body.identifier }, (err, bar) => {
         if (err) { return res.json(err); }
         if (!bar) {
-            console.log("no " + req.body.identifier);
             return res.json({ msg: "no-going" });
         } else {
             res.json({ msg: "someoneGoing", going: bar.going });
@@ -199,30 +192,7 @@ app.post('/getGoing', (req, res) => {
     });
 });
 
-// search for bar with provided location (used for dev)
-app.get('/search/:location', (req, res) => {
-    yelp.search({ term: 'bar', location: req.params.location, limit: 20 })
-        .then((data) => {
-            var array = [];
-            var bars = data.businesses;
-            console.log(bars.length);
-            for (var i = 0; i < bars.length; i++) {
-                array.push({
-                    identifier: bars[i].id,
-                    image_url: bars[i].image_url,
-                    name: bars[i].name,
-                    url: bars[i].url,
-                    snippet_text: bars[i].snippet_text
-                });
-                if (i == (bars.length - 1)) {
-                    return res.json(bars);
-                }
-            }
-        })
-        .catch((err) => {
-            return res.json(JSON.parse(err.data));
-        });
-});
+
 
 
 
