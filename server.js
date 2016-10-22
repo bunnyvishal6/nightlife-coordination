@@ -10,7 +10,10 @@ var express = require('express'),
     config = require('./config/config'),
     Bar = require('./models/bar');
 
-//connect mongoose
+//mongoose default basic es6 promise
+mongoose.Promise = global.Promise;
+
+//connect to mongodb
 mongoose.connect(config.db);
 
 //Setup yelp client
@@ -97,29 +100,14 @@ app.post('/search/:location', (req, res) => {
         });
 });
 
-//user wanna got to this bar 
-app.post('/goingTo', passport.authenticate('jwt', { session: false }), (req, res) => {
-    if (req.session.user) {
-        Bar.findOrCreate(req.body.bar, (err, bar) => {
-            if(err){console.log(err); return res.json(err);}
-            const num = bar.going.indexOf(req.user._id);
-            if(num < 0){
-                bar.going.push(req.user._id);
-                bar.save((err)=>{
-                    if(err){console.log(err); return res.json(err);}
-                    return res.json("going");
-                });
-            } else {
-                bar.going.splice(num, 1);
-                bar.save((err)=>{
-                    if(err){console.log(err); return res.json(err)}
-                    return res.json("not-going");
-                });
-            }
-        });
-    } else {
-        res.status(401).json("no jwt found");
+//check for savedSearch
+app.get('/checkForSavedSearch', (req, res) => {
+    console.log('checkForSavedSearch called');
+    var msg = "";
+    if (req.session.savedSearch) {
+        msg = "yes";
     }
+    res.json({ jwt: req.session.user, msg: msg });
 });
 
 //saveSearch
@@ -131,16 +119,6 @@ app.post('/saveSearch', (req, res) => {
     } else {
         res.json("no-save-search");
     }
-});
-
-//check for savedSearch
-app.get('/checkForSavedSearch', (req, res) => {
-    console.log('checkForSavedSearch called');
-    var msg = "";
-    if (req.session.savedSearch) {
-        msg = "yes";
-    }
-    res.json({ jwt: req.session.user, msg: msg });
 });
 
 //get savedSearch
@@ -163,7 +141,7 @@ app.get('/savedSearch', (req, res) => {
                     if (i == (bars.length - 1)) {
                         const savedSearch = req.session.savedSearch;
                         req.session.savedSearch = null;
-                        return res.json({ bars: bars, savedSearch: savedSearch });
+                        return res.json({ bars: array, savedSearch: savedSearch });
                     }
                 }
             })
@@ -172,6 +150,53 @@ app.get('/savedSearch', (req, res) => {
                 return res.json(JSON.parse(err.data));
             });
     }
+});
+
+//user wanna got to this bar 
+app.post('/goingTo', passport.authenticate('jwt', { session: false }), (req, res) => {
+    if (req.session.user) {
+        Bar.findOrCreate(req.body.bar, (err, bar) => {
+            if (err) { console.log(err); return res.json(err); }
+            const num = bar.going.indexOf(req.user._id);
+            if (num < 0) {
+                bar.going.push(req.user._id);
+                bar.save((err) => {
+                    if (err) { console.log(err); return res.json(err); }
+                    return res.json("going");
+                });
+            } else {
+                //If bar.going length is one then remove the doc from the database else just remove the user from the bar.going array.
+                if (bar.going.length == 1) {
+                    bar.remove((err)=>{
+                        if(err){return console.log(err);}
+                        return res.json("not-going");
+                    });
+                } else {
+                    bar.going.splice(num, 1);
+                    bar.save((err) => {
+                        if (err) { console.log(err); return res.json(err) }
+                        return res.json("not-going");
+                    });
+                }
+            }
+        });
+    } else {
+        res.status(401).json("no jwt found");
+    }
+});
+
+//getGoing number for the bar
+app.post('/getGoing', (req, res) => {
+    console.log(req.body.identifier);
+    Bar.findOne({ identifier: req.body.identifier }, (err, bar) => {
+        if (err) { return res.json(err); }
+        if (!bar) {
+            console.log("no " + req.body.identifier);
+            return res.json({ msg: "no-going" });
+        } else {
+            res.json({ msg: "someoneGoing", going: bar.going });
+        }
+    });
 });
 
 // search for bar with provided location (used for dev)
